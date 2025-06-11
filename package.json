@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
     "@tailwindcss/vite": "^4.1.8",
+    "firebase": "^11.9.1",
     "localforage": "^1.10.0",
     "match-sorter": "^8.0.2",
     "react": "^19.1.0",

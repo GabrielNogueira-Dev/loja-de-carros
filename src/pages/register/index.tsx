@@ -35,8 +35,9 @@ const navigate = useNavigate()
  async function handleLogout(){
    await signOut(auth)
    console.log('Usuário deslogado com sucesso!')
-   navigate('/', {replace: true})
+   
  }
+
  handleLogout();
   },[] )
 
@@ -103,7 +104,7 @@ navigate('/dashboard',{replace:true})
 </form>
 
 <Link to="/login">
-Já possui uma conta? <span className='text-blue-500'>Faça login</span>  
+Já possui uma conta? <span className='cursor-pointer text-blue-500'>Faça login</span>  
 </Link>
 
    </div>

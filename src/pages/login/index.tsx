@@ -30,7 +30,7 @@ const navigate = useNavigate()
 async function handleLogout(){
   await signOut(auth)
   console.log('Usuário deslogado com sucesso!')
-  navigate('/', {replace: true})
+
 }
 handleLogout();
  },[] )
@@ -86,7 +86,7 @@ function onsubmit(data: FormData){
 
 </form>
 
-<Link to="/register"> Ainda não possui cadastro ? <span className='text-blue-500'>Cadastre-se</span> </Link>
+<Link to="/register"> Ainda não possui cadastro ? <span className='cursor-pointer text-blue-500'>Cadastre-se</span> </Link>
 
    </div>
  </Container>

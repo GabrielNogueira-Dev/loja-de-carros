@@ -1,6 +1,6 @@
 
 
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { signOut } from 'firebase/auth'
 
 import logoImg from '../../assets/logo.svg'
@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 
 import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth'
 import { auth } from '../../services/firebaseconection'
+import { AuthContext } from '../../context/AuthContext'
 
 const schema = z.object({
   name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').nonempty('Nome é obrigatório'),  
@@ -24,7 +25,9 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 export function Register() {
-const navigate = useNavigate()
+  const { handleInfoUser } = useContext(AuthContext)
+
+  const navigate = useNavigate()
 
  const { register, handleSubmit, formState: {errors} } = useForm<FormData>({
     resolver:zodResolver(schema),
@@ -48,6 +51,12 @@ async function onsubmit(data: FormData){
     await updateProfile(user.user,{
       displayName: data.name
     })
+handleInfoUser({
+  uid: user.user.uid,
+  name: data.name,
+  email: data.email,
+})
+
 console.log('Usuário cadastrado com sucesso!')
 navigate('/dashboard',{replace:true})
   })

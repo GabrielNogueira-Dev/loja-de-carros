@@ -3,7 +3,7 @@ import { auth } from "../services/firebaseconection";
 import { onAuthStateChanged } from "firebase/auth";
 
 import {createContext, useState,useEffect, type ReactNode } from "react";
-import { set } from "react-hook-form";
+
 
 
 interface AuthProviderProps {
@@ -13,6 +13,8 @@ interface AuthProviderProps {
 type AuthContextData = {
     signed: boolean;
     loadingAuth:boolean;
+    handleInfoUser: ({name,email,uid}: UserProps) => void;
+    user: UserProps | null;
 }
 
 interface UserProps {
@@ -48,8 +50,18 @@ return () => {
 }
 },[])
 
+function handleInfoUser({name,email,uid}:UserProps) {
+setUser({
+    name,
+    email,
+    uid,
+})
+}
+
 return(
-    <AuthContext.Provider value = {{signed:!!user, loadingAuth,}}>
+    <AuthContext.Provider value = {{signed:!!user, loadingAuth,
+handleInfoUser, user,
+    }}>
         {children}
     </AuthContext.Provider>
 )

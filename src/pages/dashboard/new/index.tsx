@@ -1,11 +1,19 @@
+import { type ChangeEvent, useContext, useState } from 'react';
 import { Container } from '../../../components/container';
 import { PainelHeader } from '../../../components/painelheader';
+import { AuthContext } from '../../../context/AuthContext';
 
 import { FiUpload } from 'react-icons/fi';
 import { useForm } from 'react-hook-form';
 import { Input } from '../../../components/input';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { v4 as uuidv4 } from 'uuid';
+import { _uuidv4 } from 'zod/v4/core';
+import { supabase } from '../../../services/supabaseClient';
+//import {storage} mas precisa pagar para ter
+// import { ref, uploadBytes, getDownloadURL, deleteObject}
+
 
 const schema = z.object({
   name: z.string().nonempty('Nome é obrigatório'),
@@ -23,13 +31,94 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function New() {
- const {register, handleSubmit, formState:{errors},reset} = useForm<FormData>({
-  resolver: zodResolver(schema),})
+  const {user} = useContext(AuthContext)
+  const {register, handleSubmit, formState:{errors},reset} = useForm<FormData>({
+    resolver: zodResolver(schema),})
+
+  interface ImageItemProps {
+    uid:string;
+    name:string;
+    previewUrl:string;
+    url:string;
+  }
+
+  const [carImages,setCarImages] = useState<ImageItemProps[]>([])
+
+  function handleFile(e:ChangeEvent<HTMLInputElement>){
+    if (e.target.files && e.target.files[0]){
+      const image = e.target.files[0]
+      if(image.type === 'image/jpeg' || image.type === 'image/png'){
+        console.log(image)
+        handleUpload(image)
+      }else{
+        alert("Envie em formato JPEG ou PNG")
+      }
+    }
+  }
+
+  async function handleUpload(image: File) {
+  if (!user?.uid) {
+    alert("Usuário não está logado");
+    return;
+  }
+
+  const uniqueName = `${uuidv4()}-${image.name}`;
+
+  // Upload do arquivo
+  const { data, error } = await supabase.storage
+    .from("arquivo")
+    .upload(uniqueName, image);
+
+  if (error) {
+    alert("Erro ao enviar arquivo: " + error.message);
+    console.error(error);
+    return;
+  }
+
+  // Obter URL pública
+  const { data: publicUrlData } = supabase.storage
+    .from("arquivo")
+    .getPublicUrl(uniqueName);
+
+  // Adicionar a imagem no estado para preview
+  const imageItem: ImageItemProps = {
+    name: uniqueName,
+    uid: user.uid,
+    previewUrl: URL.createObjectURL(image),
+    url: publicUrlData.publicUrl,
+  };
+
+  setCarImages((images) => [...images, imageItem]);
+}
+
+    /*
+    // trecho comentado original - não alterei
+    if(!user?.uid){
+      return;
+    }
+    //  const currentUid = user?.uid
+    //  const UidImage = uuidv4()
+
+    //  const upLoadRef = ref(Storage,`images/${currentUid}/${UidImage}`);
+
+    //  uploadBytes(upLoadRef,image)
+    //  .then((snapshot) => {
+    //    getdownloadurl(snapshot.ref).then((downloadurl)=>{
+    //      console.log("URL DE ACESSO A FOTO",downloadurl)
+    //      const imageItem = {
+    //        name:uidImage,
+    //        uid:currentUid,
+    //        previewUrl: URL.createObjectURL(image),
+    //        url:downloadurl,
+    //    }
+    //        setCarImages((images) => {...images,imageItem})
+    //    })
+    //  })
+    */
+  
 
   function onSubmit(data: FormData) {
-    console.log(data);
-   
-
+    console.log(data)
   }
 
   return (
@@ -42,9 +131,18 @@ export function New() {
           <FiUpload size={24} color="#000" />
          </div>
          <div className='cursor-pointer'>
-          <input type="file" accept='image/*' className='opacity-0 cursor-pointer' />
+          <input type="file" accept='image/*' 
+          className='opacity-0 cursor-pointer'
+             onChange={handleFile} />
          </div>
         </button>
+
+        {carImages.map((item)=> (
+            <div key={item.name}>
+              <img src={item.url} alt="foto do carro"
+              className='rounded-lg w-full h-32 object-cover' />
+            </div>
+        ))}
       </div>
 
       <div className='w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-1'>
@@ -149,4 +247,3 @@ export function New() {
     </Container>
   )
 }
-

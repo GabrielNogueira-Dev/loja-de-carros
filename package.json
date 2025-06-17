@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
+    "@supabase/supabase-js": "^2.50.0",
     "@tailwindcss/vite": "^4.1.8",
     "firebase": "^11.9.1",
     "localforage": "^1.10.0",
@@ -22,12 +23,14 @@
     "react-router-dom": "^7.6.2",
     "sort-by": "^1.2.0",
     "tailwindcss": "^4.1.8",
+    "uuid": "^11.1.0",
     "zod": "^3.25.62"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^4.4.1",
     "eslint": "^9.25.0",
     "eslint-plugin-react-hooks": "^5.2.0",

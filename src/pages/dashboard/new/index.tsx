@@ -2,7 +2,7 @@ import { type ChangeEvent, useContext, useState } from 'react';
 import { Container } from '../../../components/container';
 import { PainelHeader } from '../../../components/painelheader';
 import { AuthContext } from '../../../context/AuthContext';
-
+import { FiTrash } from 'react-icons/fi';
 import { FiUpload } from 'react-icons/fi';
 import { useForm } from 'react-hook-form';
 import { Input } from '../../../components/input';
@@ -13,6 +13,8 @@ import { _uuidv4 } from 'zod/v4/core';
 import { supabase } from '../../../services/supabaseClient';
 //import {storage} mas precisa pagar para ter
 // import { ref, uploadBytes, getDownloadURL, deleteObject}
+import { addDoc, collection, } from 'firebase/firestore';
+import { db } from '../../../services/firebaseconection';
 
 
 const schema = z.object({
@@ -57,6 +59,7 @@ export function New() {
   }
 
   async function handleUpload(image: File) {
+    console.log(image.name)
   if (!user?.uid) {
     alert("Usuário não está logado");
     return;
@@ -65,13 +68,13 @@ export function New() {
   const uniqueName = `${uuidv4()}-${image.name}`;
 
   // Upload do arquivo
-  const { data, error } = await supabase.storage
+  const { data } = await supabase.storage
     .from("arquivo")
     .upload(uniqueName, image);
+console.log(data)
 
-  if (error) {
-    alert("Erro ao enviar arquivo: " + error.message);
-    console.error(error);
+  if (data) {
+    alert("Erro ao enviar arquivo: " + data)
     return;
   }
 
@@ -118,8 +121,49 @@ export function New() {
   
 
   function onSubmit(data: FormData) {
+   
+    if(carImages.length === 0){
+      alert("envie imagem do carro")
+    }
+   
+      const carListImageAtt = carImages.map(car => {
+        return{
+          uid:car.uid,
+          name:car.name,
+          url:car.url
+        }
+      }) 
+
+      addDoc(collection(db,"cars"),{
+        name:data.name,
+        model:data.model,
+        whatsapp:data.whatsapp,
+        city:data.city,
+        year:data.year,
+        km:data.km,
+        price:data.price,
+        description:data.description,
+        created:new Date(),
+        owner:user?.name,
+        uid:user?.uid,
+        images:carListImageAtt
+      })
+      .then(()=>{
+        reset()
+        setCarImages([])
+          console.log("cadastrado com sucess")
+      })
+      .catch((err)=>{console.log(err)})
+
     console.log(data)
   }
+
+async function handleDelete(ite: ImageItemProps) {
+
+setCarImages(carImages.filter((item)=> item.url !== ite.url))
+}
+
+
 
   return (
     <Container>
@@ -137,12 +181,23 @@ export function New() {
          </div>
         </button>
 
-        {carImages.map((item)=> (
-            <div key={item.name}>
-              <img src={item.url} alt="foto do carro"
-              className='rounded-lg w-full h-32 object-cover' />
-            </div>
-        ))}
+        {carImages.map((item) => (
+  <div key={item.name} className="relative w-48 h-32 rounded-lg overflow-hidden">
+    <img
+      src={item.previewUrl}
+      alt="foto do carro"
+      className="rounded-lg w-full h-full object-cover"
+    />
+    <button
+      type="button"
+      onClick={() => handleDelete(item)}
+      className="absolute top-2 right-2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white rounded-full p-1"
+      title="Deletar imagem"
+    >
+      <FiTrash size={18} />
+    </button>
+  </div>
+))}
       </div>
 
       <div className='w-full bg-white p-3 rounded-lg flex flex-col sm:flex-row items-center gap-2 mt-1'>

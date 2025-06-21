@@ -25,7 +25,8 @@ interface CarImageProps{
 export function Home() {
  const [cars,setCars] = useState<CarsProps[]>([])
 const [loadimages,setLoadImages]= useState<string[]>([])
-    useEffect(()=>{
+   
+useEffect(()=>{
   
         function loadCars(){
             const  carsRef = collection(db, "cars")

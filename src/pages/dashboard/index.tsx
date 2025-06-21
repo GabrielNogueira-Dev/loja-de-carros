@@ -1,6 +1,7 @@
 import { useEffect,useState,useContext } from "react"
 import { collection,getDocs,where, query,doc,deleteDoc } from "firebase/firestore"
-import { db } from "../../services/firebaseconection"
+import { db,/*storage*/ } from "../../services/firebaseconection"
+/* import {ref,deleteObject} from "firebase/storage" */
 import { AuthContext } from "../../context/AuthContext"
 
 import { Container } from "../../components/container"
@@ -65,10 +66,17 @@ export function Dashboard() {
         loadCars()
     },[user])
 
-async function handleDeleteCar(id:string) {
+async function handleDeleteCar(id:string /*car:CarProps */) {
   const docRef = doc(db,"cars",id)
   await deleteDoc(docRef)
   setCars(cars.filter(car => car.id !== id))
+  /* car.images.map( async (image)=>{
+      const imagepath = `images/${images.uid}/${images.name}` --> ISTO E PARA DELETAR O STORAGE,
+      const imageref = ref(storage,imagepath)                      POIS NAO TENHO O BLAZE
+       try{
+        await deleteObject(imageref)}
+        catch(err){console.log(err)}
+}) */
 }
 
   return (
@@ -80,15 +88,15 @@ async function handleDeleteCar(id:string) {
   
   {cars.map(car=>(
     <section key={car.id}
-     className="w-full bg-white rounded-lg relative"> 
+     className=" w-full bg-white rounded-lg relative"> 
 
    <button onClick={ ()=> handleDeleteCar(car.id) }
-    className=" cursor-pointer absolute bg-white w-14 h-14 rounded-full flex items-center justify-center right-2 top-2 drop-shadow">
-    <FiTrash2  size={26} color="black"/>
+    className="hover:scale-105 transition-all cursor-pointer absolute bg-white w-12 h-12 rounded-full flex items-center justify-center sm:left-3 md:right-2 top-2 drop-shadow">
+    <FiTrash2  size={24} color="black"/>
    </button>
 
-    <img className=" w-full rounded-lg mb-2 max-h-70"
-   src="https://th.bing.com/th/id/OIP.eIknJM5OAK6R51BVsYjv3gHaE7?w=283&h=188&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="" />
+    <img className=" cursor-pointer sm:w-auto w-full rounded-lg mb-2 max-h-70 "
+   src="https://th.bing.com/th/id/OIP.7slBGsTX7bE4JmTKo9f4_wHaEK?w=267&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="" />
    <p className="font-bold mt-1 px-2 mb-2">carro</p>
 
 <div className="flex flex-col px-2">
@@ -108,6 +116,7 @@ async function handleDeleteCar(id:string) {
 </div>
 
   </section>
+  
   ))}
 
 </main>

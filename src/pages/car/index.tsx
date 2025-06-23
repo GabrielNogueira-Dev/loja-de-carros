@@ -1,7 +1,7 @@
 import { useState,useEffect } from "react"
 import { Container } from "../../components/container"
 import {FaWhatsapp} from 'react-icons/fa'
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 
 import { getDoc,doc } from "firebase/firestore"
 import { db } from "../../services/firebaseconection"
@@ -36,6 +36,7 @@ export function CarDetail() {
   const [cars,setCars] = useState<CarsProps>()
   const {id} =useParams()
   const [sliderPerView,setSliderPerView] = useState<number>(2)
+  const navigate = useNavigate()
 
   useEffect( () =>{
     async function loadCar(){
@@ -44,6 +45,11 @@ export function CarDetail() {
       const docRef = doc(db, "cars",id)
       getDoc(docRef)
       .then((snapshot)=>{
+
+        if(!snapshot.data()){
+          navigate("/")
+        }
+
         setCars({
           id:snapshot.id,
           name:snapshot.data()?.name,
@@ -90,18 +96,20 @@ function handleResize(){
   return (
   <Container>
     
-    <Swiper slidesPerView={sliderPerView}
+    {cars && (
+      <Swiper slidesPerView={sliderPerView}
             pagination = {{clickable:true}}
             navigation
-    >
-{cars?.images.map(image => (
-  <SwiperSlide key={image.name}>
-<img src={image.url} className="w-full h- object-cover" />
-  </SwiperSlide>
+      >
+  {cars?.images.map(image => (
+    <SwiperSlide key={image.name}>
+  <img src={image.url} className="w-full h- object-cover" />
+    </SwiperSlide>
 
-))}
+  ))}
 
     </Swiper>
+    )}
 
     {cars && (
       <main className="w-full bg-white rounded-lg p-6 my-4">
@@ -138,7 +146,10 @@ function handleResize(){
       <strong>Telefone:</strong>
       <p className="mb-4">{cars?.whatsapp}</p>
 
-      <a className="bg-green-500 w-full text-white flex items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium cursor-pointer">
+      <a href={`https://api.whatsapp.com//send?phone=${cars?.whatsapp}&text=Olá vi este ${cars.name},ainda está disponível?`}
+      className="bg-green-500 w-full text-white flex items-center justify-center gap-2 my-6 h-11 text-xl rounded-lg font-medium cursor-pointer"
+      target="_blank"
+      >
      Conversar com vendedor <FaWhatsapp size={26} color="white"/> 
       </a>
 

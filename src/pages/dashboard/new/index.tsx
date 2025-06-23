@@ -16,6 +16,7 @@ import { supabase } from '../../../services/supabaseClient';
 import { addDoc, collection, } from 'firebase/firestore';
 import { db } from '../../../services/firebaseconection';
 
+import toast from 'react-hot-toast';
 
 const schema = z.object({
   name: z.string().nonempty('Nome é obrigatório'),
@@ -92,6 +93,7 @@ console.log(data)
   };
 
   setCarImages((images) => [...images, imageItem]);
+  toast.success("Imagem adicionada com sucesso!")
 }
 
     /*
@@ -123,7 +125,8 @@ console.log(data)
   function onSubmit(data: FormData) {
    
     if(carImages.length === 0){
-      alert("envie imagem do carro")
+     toast.error("Envie uma imagem ")
+      return
     }
    
       const carListImageAtt = carImages.map(car => {
@@ -135,7 +138,7 @@ console.log(data)
       }) 
 
       addDoc(collection(db,"cars"),{
-        name:data.name,
+        name:data.name.toUpperCase(),
         model:data.model,
         whatsapp:data.whatsapp,
         city:data.city,
@@ -151,7 +154,7 @@ console.log(data)
       .then(()=>{
         reset()
         setCarImages([])
-          console.log("cadastrado com sucess")
+          toast.success("Carro cadastrado com sucesso!")
       })
       .catch((err)=>{console.log(err)})
 

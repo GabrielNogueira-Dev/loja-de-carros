@@ -16,6 +16,8 @@ import { createUserWithEmailAndPassword,updateProfile } from 'firebase/auth'
 import { auth } from '../../services/firebaseconection'
 import { AuthContext } from '../../context/AuthContext'
 
+import toast from 'react-hot-toast'
+
 const schema = z.object({
   name: z.string().min(3, 'Nome deve ter pelo menos 3 caracteres').nonempty('Nome é obrigatório'),  
   email: z.string().email('Email inválido').nonempty('Email é obrigatório'),
@@ -58,6 +60,7 @@ handleInfoUser({
 })
 
 console.log('Usuário cadastrado com sucesso!')
+toast.success("Bem vindo ao Web carros!")
 navigate('/dashboard',{replace:true})
   })
   .catch((error) => {

@@ -97,7 +97,7 @@ async function handleDeleteCar(id:string /*car:CarProps */) {
 
     <img className=" cursor-pointer sm:w-auto w-full rounded-lg mb-2 max-h-70 "
    src="https://th.bing.com/th/id/OIP.7slBGsTX7bE4JmTKo9f4_wHaEK?w=267&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3" alt="" />
-   <p className="font-bold mt-1 px-2 mb-2">carro</p>
+   <p className="font-bold mt-1 px-2 mb-2">{car?.name}</p>
 
 <div className="flex flex-col px-2">
     <span className="text-zinc-700">
